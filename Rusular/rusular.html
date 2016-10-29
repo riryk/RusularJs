@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <script src="scripts/jquery.js"></script>
+    <script src="scripts/jquery-ui-1.10.4.js"></script>
+
+    <script src="scripts/rusular/providers/compile/compile-provider.js"></script>
+    <script src="scripts/rusular/providers/scope/rootscope-provider.js"></script>
+    <script src="scripts/rusular/providers/locale-provider.js"></script>
+
+    <script src="scripts/rusular/injector/module-loader.js"></script>
+    <script src="scripts/rusular/injector/internal-injector.js"></script>
+    <script src="scripts/rusular/injector/injector.js"></script>
+
+    <script src="scripts/rusular/module.js"></script>
+    <script src="scripts/rusular/rusular.js"></script>
+</head>
+<body rus-app>
+    <input rus-model="name" type="text">
+    <h1>Hello {{ name }}</h1>
+</body>
+</html>
