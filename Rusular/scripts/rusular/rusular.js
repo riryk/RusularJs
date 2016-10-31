@@ -45,6 +45,36 @@
         return destinationObject;
     }
 
+    var uniqueIds = ["0", "0", "0"];
+
+    function nextUniqueId() {
+        var digit;
+        loopFromEnd(uniqueIds, function (index) {
+            digit = uniqueIds[index].charCodeAt(0);
+            if (digit === 57 /*'9'*/) {
+                uniqueIds[index] = "A";
+                return uniqueIds.join("");
+            }
+            if (digit === 90  /*'Z'*/) {
+                uniqueIds[index] = "0";
+            }
+            else {
+                uniqueIds[index] = String.fromCharCode(digit + 1);
+                return uniqueIds.join("");
+            }
+        });
+        uniqueIds.unshift("0");
+        return uniqueIds.join("");
+    }
+
+    function loopFromEnd(array, action) {
+        var index = array.length;
+        while (index) {
+            index = index - 1;
+            action(index);
+        }
+    }
+
     var noRusElement = {};
 
     function findRusElementInContainerChildren(containerElement) {
@@ -72,8 +102,10 @@
         provide.provider({ rootScope: rootScopeProvider });
     }
 
+    var moduleLoader;
+
     function setupModuleLoader() {
-        addPropertyToObjectAndReturn(rusular, "module", moduleFactory);
+        moduleLoader = addPropertyToObjectAndReturn(rusular, "module", moduleFactory);
     }
 
     function exposeExternalApi() {
@@ -97,7 +129,7 @@
 
         modulesToLoad.unshift("rus");
 
-        var injector = createInjector(modulesToLoad);
+        var injector = createInjector(moduleLoader, modulesToLoad);
     }
 
     function initialize(containerElement) {

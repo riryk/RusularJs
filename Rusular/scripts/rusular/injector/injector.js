@@ -1,5 +1,5 @@
 ﻿
-function createInjector(modulesToLoad) {
+function createInjector(moduleLoader, modulesToLoad) {
     var providerSuffix = "Provider";
 
     var instanceCache = {};
@@ -18,7 +18,9 @@ function createInjector(modulesToLoad) {
     var instanceInjector = createInternalInjector(instanceCache, instantiateService);
     instanceCache.injector = instanceInjector;
 
-    var moduleRunBlocks = loadModules(providerInjector, modulesToLoad);
+    var bootstrapModules = createModulesBootstrapper(providerInjector, moduleLoader);
+    var moduleRunBlocks = bootstrapModules(modulesToLoad);
+
     invokeRunBlocks(moduleRunBlocks);
 
     function invokeRunBlocks(runBlocks) {
