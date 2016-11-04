@@ -1,16 +1,17 @@
-﻿function createModulesBootstrapper(providerInjector, moduleLoader) {
-    var loadedModules = [];
+﻿function createModulesBootstrapper(providerInjector, getModule) {
 
-    return loadModules;
+    var loadedModules = new HashMap();
 
-    function loadModules(modulesToLoad) {
+    return bootstrapModules;
+
+    function bootstrapModules(modulesToLoad) {
         var runBlocks = [];
-        forEachNotLoadedModules(modulesToLoad, function() {
+        forEachNotLoadedModules(modulesToLoad, function (module) {
             if (isString(module)) {
-                var moduleConfig = moduleLoader(module);
-                var dependentRunBlocks = loadModules(moduleConfig.dependencies);
-                runBlocks = runBlocks.concat(dependentRunBlocks).concat(moduleConfig.runBlocks);
-                processInvokeQueue(moduleConfig.invokeQueue);
+                var moduleInstance = getModule(module);
+                var dependentRunBlocks = bootstrapModules(moduleInstance.dependencies);
+                runBlocks = runBlocks.concat(dependentRunBlocks).concat(moduleInstance.runBlocks);
+                processInvokeQueue(moduleInstance.invokeQueue);
             }
             else if (isFunction(module)) {
                 runBlocks.push(providerInjector.invoke(module));
@@ -32,7 +33,7 @@
     }
 
     function moduleIsNotLoaded(module) {
-        return loadedModules.get(module);
+        return !loadedModules.get(module);
     }
 
     function markModuleAsLoaded(module) {
@@ -40,9 +41,16 @@
     }
 
     function processInvokeQueue(invokeQueue) {
-        loop(invokeQueue, function(invokeItems) {
-            var provider = providerInjector.get(invokeItems[0]);
-            provider[invokeItems[1]].apply(provider, invokeItems[2]);
+        loop(invokeQueue, function (invokeItems) {
+
+            var serviceName = invokeItems[0];
+            var serviceInstance = providerInjector.getService(serviceName);
+
+            var serviceMethodName = invokeItems[1];
+            var serviceMethod = serviceInstance[serviceMethodName];
+
+            var serviceMethodArguments = invokeItems[2];
+            serviceMethod.apply(serviceInstance, serviceMethodArguments);
         });
     }
 
@@ -50,5 +58,9 @@
         for (var index = 0; index < array.length; index++) {
             action(array[index]);
         }
+    }
+
+    function isString(value) {
+        return typeof value === "string";
     }
 }

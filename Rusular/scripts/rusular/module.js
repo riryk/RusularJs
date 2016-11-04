@@ -2,7 +2,7 @@
     var modules = {};
 
     return function (moduleName, moduleDependencies, moduleConfigFunction) {
-        return window.addPropertyToObjectAndReturn(modules, moduleName, function () {
+        return window.getOrAddProperty(modules, moduleName, function () {
             var invokeQueue = [];
             var blocksToRun = [];
             var config = invokeLater("injector", "invoke");
@@ -11,7 +11,7 @@
                 invokeQueue: invokeQueue,
                 blocksToRun: blocksToRun,
                 dependencies: moduleDependencies,
-                name: name,
+                name: moduleName,
                 provider: invokeLater("provide", "provider"),
                 factory: invokeLater("provide", "factory"),
                 service: invokeLater("provide", "service"),

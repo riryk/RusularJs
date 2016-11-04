@@ -185,10 +185,9 @@
     <Content Include="scripts\rusular\initializer\internal-injector.js" />
     <Content Include="scripts\rusular\helpers\property-finder.js" />
     <Content Include="scripts\rusular\initializer\module-loader.js" />
-    <Content Include="scripts\rusular\initializer\rusular-bootstrapper.js" />
     <Content Include="scripts\rusular\injector\injector.js" />
     <Content Include="scripts\rusular\injector\internal-injector.js" />
-    <Content Include="scripts\rusular\injector\module-loader.js" />
+    <Content Include="scripts\rusular\modules-bootstrapper.js" />
     <Content Include="scripts\rusular\providers\locale-provider.js" />
     <Content Include="scripts\rusular\module.js" />
     <Content Include="scripts\rusular\providers\async-callback-provider.js" />

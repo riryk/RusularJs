@@ -1,45 +1,19 @@
 ﻿
 function HashMap(array) {
-	function nextUid() {
-	};
+    forEach(array, this.put, this);
+};
 
-	function getHashKeyForObject(object) {
-		if (object.$$hashKey === "function") {
-			return object.$$hashKey();
-		}
-		object.$$hashKey = nextUid();
-		return object.$$hashKey;
-	};
-
-	function hashKey(object) {
-		var objType = typeof object,
-            key;
-
-		if (objType === "object" && object !== null) {
-			key = getHashKeyForObject(object);
-		} else {
-			key = object;
-		}
-
-		return objType + ":" + key;
-	}
-
-	forEach(array, this.put, this);
-
-    return {
-        put: function (key, value) {
-            var hash = hashKey(key);
-            this[hash] = value;
-        },
-        get: function (key) {
-            var hash = hashKey(key);
-            return this[hash];
-        },
-        remove: function (key) {
-            var hash = hashKey(key);
-            var value = this[hash];
-            delete this[hash];
-            return value;
-        }
-    };
-}
+HashMap.prototype = {
+    put: function (key, value) {
+        this[hashKey(key)] = value;
+    },
+    get: function (key) {
+        return this[hashKey(key)];
+    },
+    remove: function (key) {
+        var hash = hashKey(key);
+        var value = this[hash];
+        delete this[key];
+        return value;
+    }
+};

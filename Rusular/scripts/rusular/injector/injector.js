@@ -1,14 +1,14 @@
 ﻿
-function createInjector(moduleLoader, modulesToLoad) {
+function createInjector(getModule, modulesToLoad) {
     var providerSuffix = "Provider";
 
     var instanceCache = {};
     var providerCache = {
         provide: {
-            provider: decorateFunctionWithObjectSupport(addProvider),
-            factory: decorateFunctionWithObjectSupport(addFactory),
-            service: decorateFunctionWithObjectSupport(addService),
-            constant: decorateFunctionWithObjectSupport(addConstant)
+            provider: addProvider,
+            factory: addFactory,
+            service: addService,
+            constant: addConstant
         }
     };
 
@@ -18,7 +18,7 @@ function createInjector(moduleLoader, modulesToLoad) {
     var instanceInjector = createInternalInjector(instanceCache, instantiateService);
     instanceCache.injector = instanceInjector;
 
-    var bootstrapModules = createModulesBootstrapper(providerInjector, moduleLoader);
+    var bootstrapModules = createModulesBootstrapper(providerInjector, getModule);
     var moduleRunBlocks = bootstrapModules(modulesToLoad);
 
     invokeRunBlocks(moduleRunBlocks);
@@ -59,18 +59,12 @@ function createInjector(moduleLoader, modulesToLoad) {
         instanceCache[constantName] = constantValue;
     }
 
-    function decorateFunctionWithObjectSupport(originalFunction) {
-        return function (key, value) {
-            if (isObject(key)) {
-                forEach(key, originalFunction);
-            } else {
-                return originalFunction(key, value);
-            }
-        };
-    }
-    
     function throwUnknownProviderException() {
         throw Error("Unknown provider");
+    }
+
+    function isFunction(object) {
+        return typeof object === "function";
     }
 
     function doNothingRunBlock() { }

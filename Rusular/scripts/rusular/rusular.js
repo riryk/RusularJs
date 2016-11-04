@@ -12,23 +12,24 @@
         throw new Error("JQuery is not defined");
     }
 
-    window.rusQuery = window.jQuery;;
+    window.rusQuery = window.jQuery;
+    window.annonate = createAnnotate();
 
     function forEach(object, iterator, context) {
         for (var property in object) {
             if (object.hasOwnProperty(property)) {
-                iterator.call(context, property, object[property]);
+                iterator.call(context, object[property], property);
             }
         }
     }
 
     window.forEach = forEach;
 
-    function addPropertyToObjectAndReturn(object, propertyName, propertyValueFactory) {
+    function getOrAddProperty(object, propertyName, propertyValueFactory) {
         return object[propertyName] || (object[propertyName] = propertyValueFactory());
     }
 
-    window.addPropertyToObjectAndReturn = addPropertyToObjectAndReturn;
+    window.getOrAddProperty = getOrAddProperty;
 
     function copyAllProperties(sourceObject, targetObject) {
         forEach(sourceObject, function (propertyName, propertyValue) {
@@ -49,13 +50,14 @@
 
     function nextUniqueId() {
         var digit;
+
         loopFromEnd(uniqueIds, function (index) {
             digit = uniqueIds[index].charCodeAt(0);
-            if (digit === 57 /*'9'*/) {
+            if (isNine(digit)) {
                 uniqueIds[index] = "A";
                 return uniqueIds.join("");
             }
-            if (digit === 90  /*'Z'*/) {
+            if (isZ(digit)) {
                 uniqueIds[index] = "0";
             }
             else {
@@ -63,8 +65,19 @@
                 return uniqueIds.join("");
             }
         });
+
         uniqueIds.unshift("0");
         return uniqueIds.join("");
+    }
+
+    window.nextUniqueId = nextUniqueId;
+
+    function isNine(digit) {
+        return digit === 57;
+    }
+
+    function isZ(digit) {
+        return digit === 90;
     }
 
     function loopFromEnd(array, action) {
@@ -74,6 +87,29 @@
             action(index);
         }
     }
+
+    function hashKey(object) {
+        var key = isNotNullObject(object) ? getOrSetObjectHashKey(object) : object;
+        return typeof (object) + ":" + key;
+    }
+
+    window.hashKey = hashKey;
+
+    function getOrSetObjectHashKey(object) {
+        if (isFunction(object.hashKey)) {
+            return object.hashKey();
+        }
+        object.hashKey = window.nextUniqueId();
+        return object.hashKey;
+    };
+
+    function isFunction(object) {
+        return typeof (object) === "function";
+    };
+
+    function isNotNullObject(object) {
+        return typeof (object) === "object" && object !== null;
+    };
 
     var noRusElement = {};
 
@@ -102,16 +138,16 @@
         provide.provider({ rootScope: rootScopeProvider });
     }
 
-    var moduleLoader;
+    var getModule;
 
-    function setupModuleLoader() {
-        moduleLoader = addPropertyToObjectAndReturn(rusular, "module", moduleFactory);
+    function createGetModuleFunction() {
+        getModule = getOrAddProperty(rusular, "module", moduleFactory);
     }
 
     function exposeExternalApi() {
         extend(rusular, { 'extend': extend });
 
-        setupModuleLoader();
+        createGetModuleFunction();
 
         rusular.module("rusLocale", [])
                .provider("locale", localeProvider);
@@ -129,7 +165,7 @@
 
         modulesToLoad.unshift("rus");
 
-        var injector = createInjector(moduleLoader, modulesToLoad);
+        var injector = createInjector(getModule, modulesToLoad);
     }
 
     function initialize(containerElement) {
