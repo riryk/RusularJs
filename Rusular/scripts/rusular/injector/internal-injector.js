@@ -2,9 +2,8 @@
 function createInternalInjector(cache, serviceFactory) {
 
     return {
-        invokeService: invokeService,
-        instantiate: instantiate,
-        getService: getService
+        getService: getService,
+        instantiate: instantiateService
     };
 
     function getService(serviceName) {
@@ -14,41 +13,44 @@ function createInternalInjector(cache, serviceFactory) {
         return cache[serviceName];
     }
 
-    function invokeService() {
-    }
-
-    function instantiate(type, parameters) {
-        var constructor = function() {};
-        var isTypeAnnotated = isArray(type);
-
-        constructor.prototype = (isTypeAnnotated ? type[type.length - 1] : type).prototype;
-        var instance = new constructor();
-        var returnedValue = invokeFunction(type, instance, parameters);
-
-        return isObject(returnedValue) || isFunction(returnedValue) ? returnedValue : instance;
-    }
-
-    function invokeFunction(functionToInvoke, self, parameterValues) {
+    function instantiateService(service, dependentServiceInstances) {
         var arguments = [];
-        var parameterNames = window.annotate(functionToInvoke);
+        var dependentServices = window.annotate(service);
 
-        for (var i = 0; i < parameterNames.length; i++) {
-            var parameterName = parameterNames[i];
-            if (typeof parameterName !== "string") {
+        loopThrough(dependentServices, function (name) {
+
+            var instance = dependentServiceInstances.hasOwnProperty(name)
+                ? dependentServiceInstances[name] :
+                getService(name);
+
+            arguments.push(instance);
+        });
+
+        if (!service.inject) {
+            service = service[dependentServices.length];
+        }
+
+        var serviceInstance = createInstanceAndInheritFrom(service);
+        var newService = service.apply(serviceInstance, arguments);
+
+        return isObjectOrFunction(newService) ? newService : serviceInstance;
+    }
+
+    function createInstanceAndInheritFrom(service) {
+        var NewService = function () { };
+        var isServiceAnnotated = isArray(service);
+
+        NewService.prototype = (isServiceAnnotated ? service[service.length - 1] : service).prototype;
+        return new NewService();
+    }
+
+    function loopThrough(array, action) {
+        for (var i = 0; i < array.length; i++) {
+            var item = array[i];
+            if (!isString(item)) {
                 throw Error("Incorrect injection token! Expected service name as string");
             }
-            var parameterValue = parameterValues && parameterValues.hasOwnProperty(key)
-				? parameterValues[parameterName]
-				: getService(parameterName);
-
-            arguments.push(parameterValue);
+            action(item);
         }
-
-        var funcIsArray = !functionToInvoke.$inject;
-        if (funcIsArray) {
-            functionToInvoke = functionToInvoke[parameterNames.length];
-        }
-
-        return functionToInvoke.apply(self, arguments);
     }
 }

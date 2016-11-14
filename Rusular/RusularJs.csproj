@@ -180,11 +180,9 @@
     <Content Include="scripts\rusular\directives\rus-include-fill-content-directive.js" />
     <Content Include="scripts\rusular\directives\rus_model\model-controller.js" />
     <Content Include="scripts\rusular\directives\rus_model\model-directive.js" />
-    <Content Include="scripts\rusular\helpers\function-annotator.js" />
+    <Content Include="scripts\rusular\helpers\annotator.js" />
     <Content Include="scripts\rusular\helpers\hashmap.js" />
-    <Content Include="scripts\rusular\initializer\internal-injector.js" />
     <Content Include="scripts\rusular\helpers\property-finder.js" />
-    <Content Include="scripts\rusular\initializer\module-loader.js" />
     <Content Include="scripts\rusular\injector\injector.js" />
     <Content Include="scripts\rusular\injector\internal-injector.js" />
     <Content Include="scripts\rusular\modules-bootstrapper.js" />

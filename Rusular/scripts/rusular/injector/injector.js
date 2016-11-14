@@ -35,7 +35,8 @@ function createInjector(getModule, modulesToLoad) {
     }
 
     function addProvider(name, provider) {
-        if (isFunction(provider) || isArray(provider)) {
+
+        if (isFunctionOrArray(provider)) {
             provider = providerInjector.instantiate(provider);
         }
         if (!provider.get) {
@@ -61,10 +62,6 @@ function createInjector(getModule, modulesToLoad) {
 
     function throwUnknownProviderException() {
         throw Error("Unknown provider");
-    }
-
-    function isFunction(object) {
-        return typeof object === "function";
     }
 
     function doNothingRunBlock() { }

@@ -13,7 +13,7 @@
     }
 
     window.rusQuery = window.jQuery;
-    window.annonate = createAnnotate();
+    window.annotate = createAnnotate();
 
     function forEach(object, iterator, context) {
         for (var property in object) {
@@ -106,6 +106,32 @@
     function isFunction(object) {
         return typeof (object) === "function";
     };
+
+    window.isFunction = isFunction;
+
+    function isArray(object) {
+        return Array.isArray(object);
+    };
+
+    window.isArray = isArray;
+
+    function isFunctionOrArray(object) {
+        return isFunction(object) || isArray(provider);
+    };
+
+    window.isFunctionOrArray = isFunctionOrArray;
+
+    function isString(item) {
+        return typeof item === "string";
+    }
+
+    window.isString = isString;
+
+    function isObjectOrFunction(item) {
+        return typeof item === "object" || typeof item === "function";
+    }
+
+    window.isObjectOrFunction = isObjectOrFunction;
 
     function isNotNullObject(object) {
         return typeof (object) === "object" && object !== null;
