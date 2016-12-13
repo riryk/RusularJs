@@ -10,7 +10,7 @@
             if (isString(module)) {
                 var moduleInstance = getModule(module);
                 var dependentRunBlocks = bootstrapModules(moduleInstance.dependencies);
-                runBlocks = runBlocks.concat(dependentRunBlocks).concat(moduleInstance.runBlocks);
+                runBlocks = concat(runBlocks, dependentRunBlocks, moduleInstance.runBlocks);
                 processInvokeQueue(moduleInstance.invokeQueue);
             }
             else if (isFunction(module)) {
@@ -60,7 +60,13 @@
         }
     }
 
-    function isString(value) {
-        return typeof value === "string";
+    function concat(toArray, firstInputArray, secondInputArray) {
+        if (firstInputArray) {
+            toArray = toArray.concat(firstInputArray);
+        }
+        if (secondInputArray) {
+            toArray = toArray.concat(secondInputArray);
+        }
+        return toArray;
     }
 }

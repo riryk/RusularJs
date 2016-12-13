@@ -8,16 +8,21 @@ function createAnnotate() {
     return annotate;
 
     function annotate(functionToAnnotate) {
+
         if (isArray(functionToAnnotate)) {
             return functionToAnnotate.slice(0, functionToAnnotate.length - 1);
         }
-
-        if (!isFunction(functionToAnnotate)) {
-            throw Error("Argument is not a function");
+        else if (isFunction(functionToAnnotate)) {
+            return annotateFunction(functionToAnnotate);
         }
 
+        throw Error("Argument is not a function or array");
+    }
+
+    function annotateFunction(functionToAnnotate) {
+
         if (!functionToAnnotate.inject) {
-            functionToAnnotate.inject = convertFunctionArgumentsToArray(func);
+            functionToAnnotate.inject = convertFunctionArgumentsToArray(functionToAnnotate);
         }
 
         return functionToAnnotate.inject;
