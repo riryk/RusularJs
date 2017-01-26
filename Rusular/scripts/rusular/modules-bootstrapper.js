@@ -5,8 +5,11 @@
     return bootstrapModules;
 
     function bootstrapModules(modulesToLoad) {
+
         var runBlocks = [];
+
         forEachNotLoadedModules(modulesToLoad, function (module) {
+
             if (isString(module)) {
                 var moduleInstance = getModule(module);
                 var dependentRunBlocks = bootstrapModules(moduleInstance.dependencies);
@@ -14,12 +17,13 @@
                 processInvokeQueue(moduleInstance.invokeQueue);
             }
             else if (isFunction(module)) {
-                runBlocks.push(providerInjector.invoke(module));
+                runBlocks.push(providerInjector.applyServiceFunction(module));
             }
             else if (isArray(module)) {
-                runBlocks.push(providerInjector.invoke(module));
+                runBlocks.push(providerInjector.applyServiceFunction(module));
             }
         });
+
         return runBlocks;
     }
 

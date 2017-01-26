@@ -1,11 +1,13 @@
 ﻿
-function compileProvider($provide, $sanitizeUriProvider) {
+function compileProvider(provide) {
 
     var suffix = "Directive";
     var registeredDirectives = {};
 
-    function directiveFactory($injector, $exceptionHandler) {
+    function directiveProvider(injector, exceptionHandler) {
+
         var directives = [];
+
         forEach(registeredDirectives[name], function (directiveFactory, index) {
             try {
                 var directive = $injector.invoke(directiveFactory);
@@ -20,30 +22,31 @@ function compileProvider($provide, $sanitizeUriProvider) {
                 directive.require = directive.require || (directive.controller && directive.name);
                 directive.restrict = directive.restrict || "A";
                 directives.push(directive);
-            } catch (e) {
-                $exceptionHandler(e);
+            } catch (ex) {
+                exceptionHandler(ex);
             }
         });
+
         return directives;
     }
 
     function registerSingleDirective(name, directiveFactory) {
         if (!registeredDirectives.hasOwnProperty(name)) {
             registeredDirectives[name] = [];
-            $provide.factory(name + suffix, ["$injector", "$exceptionHandler", directiveFactory]);
+            provide.factory(name + suffix, ["injector", "exceptionHandler", directiveProvider]);
         }
         registeredDirectives[name].push(directiveFactory);
     }
 
-    function registerDirective(name, directiveFactory) {
+    this.directive = function registerDirective(name, directiveFactory) {
         if (!isString(name)) {
-            forEach(name, reverseParams(registerDirective));
+            forEach(name, reverseParameters(registerDirective));
             return;
         }
         registerSingleDirective(name, directiveFactory);
     }
 
-    this.$get = [
+    this.get = [
         "$injector", "$interpolate", "$exceptionHandler", "$http", "$templateCache", "$parse",
         "$controller", "$rootScope", "$document", "$sce", "$animate", "$$sanitizeUri",
         function($injector, $interpolate, $exceptionHandler, $http, $templateCache, $parse,

@@ -31,6 +31,12 @@
 
     window.getOrAddProperty = getOrAddProperty;
 
+    function reverseParameters(iteratorFunction) {
+        return function (value, key) { iteratorFunction(key, value); };
+    }
+
+    window.reverseParameters = reverseParameters;
+
     function copyAllProperties(sourceObject, targetObject) {
         forEach(sourceObject, function (propertyName, propertyValue) {
             targetObject[propertyName] = propertyValue;
@@ -116,7 +122,7 @@
     window.isArray = isArray;
 
     function isFunctionOrArray(object) {
-        return isFunction(object) || isArray(provider);
+        return isFunction(object) || isArray(object);
     };
 
     window.isFunctionOrArray = isFunctionOrArray;
@@ -159,9 +165,11 @@
     }
 
     function rusModule(provide) {
+
         provide.provider("compile", compileProvider)
                .directive({ input: inputDirective });
-        provide.provider({ rootScope: rootScopeProvider });
+
+        provide.provider("rootScope", rootScopeProvider);
     }
 
     var getModule;

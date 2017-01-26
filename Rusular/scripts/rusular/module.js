@@ -5,22 +5,22 @@
         return window.getOrAddProperty(modules, moduleName, function () {
             var invokeQueue = [];
             var blocksToRun = [];
-            var config = invokeLater("injector", "invoke");
+            var config = addToInvokeQueue("injector", "applyServiceFunction");
 
             var moduleInstance = {
                 invokeQueue: invokeQueue,
                 blocksToRun: blocksToRun,
                 dependencies: moduleDependencies,
                 name: moduleName,
-                provider: invokeLater("provide", "provider"),
-                factory: invokeLater("provide", "factory"),
-                service: invokeLater("provide", "service"),
-                value: invokeLater("provide", "value"),
-                constant: invokeLater("provide", "constant", "unshift"),
-                animation: invokeLater("animateProvider", "register"),
-                filter: invokeLater("filterProvider", "register"),
-                controller: invokeLater("controllerProvider", "register"),
-                directive: invokeLater("compileProvider", "directive"),
+                provider: addToInvokeQueue("provide", "provider"),
+                factory: addToInvokeQueue("provide", "factory"),
+                service: addToInvokeQueue("provide", "service"),
+                value: addToInvokeQueue("provide", "value"),
+                constant: addToInvokeQueue("provide", "constant", "unshift"),
+                animation: addToInvokeQueue("animateProvider", "register"),
+                filter: addToInvokeQueue("filterProvider", "register"),
+                controller: addToInvokeQueue("controllerProvider", "register"),
+                directive: addToInvokeQueue("compileProvider", "directive"),
                 config: config,
                 run: function (block) {
                     blocksToRun.push(block);
@@ -32,7 +32,7 @@
 
             return moduleInstance;
 
-            function invokeLater(provider, method) {
+            function addToInvokeQueue(provider, method) {
                 return function () {
                     invokeQueue.push([provider, method, arguments]);
                     return moduleInstance;

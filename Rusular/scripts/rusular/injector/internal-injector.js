@@ -3,7 +3,8 @@ function createInternalInjector(cache, serviceFactory) {
 
     return {
         getService: getService,
-        instantiate: instantiateService
+        instantiate: instantiateService,
+        applyServiceFunction: applyServiceFunction
     };
 
     function getService(serviceName) {
@@ -13,34 +14,49 @@ function createInternalInjector(cache, serviceFactory) {
         return cache[serviceName];
     }
 
-    function instantiateService(service, dependentServiceInstances) {
-        var arguments = [];
-        var dependentServices = window.annotate(service);
+    function applyServiceFunction(serviceFunction, serviceInstance, dependentServiceInstances) {
+
+        var servicefunctionArguments = [];
+
+        var dependentServices = window.annotate(serviceFunction);
 
         loopThrough(dependentServices, function (name) {
 
-            var instance = dependentServiceInstances.hasOwnProperty(name)
+            var instance = dependentServiceInstances && dependentServiceInstances.hasOwnProperty(name)
                 ? dependentServiceInstances[name] :
                 getService(name);
 
-            arguments.push(instance);
+            servicefunctionArguments.push(instance);
         });
 
-        if (!service.inject) {
-            service = service[dependentServices.length];
+        if (!serviceFunction.inject) {
+            serviceFunction = serviceFunction[dependentServices.length];
         }
 
-        var serviceInstance = createInstanceAndInheritFrom(service);
-        var newService = service.apply(serviceInstance, arguments);
+        return serviceFunction.apply(serviceInstance, servicefunctionArguments);
+    }
+
+    function instantiateService(serviceFunction, dependentServiceInstances) {
+
+        var serviceInstance = createInstance(serviceFunction);
+
+        var newService = applyServiceFunction(serviceFunction, serviceInstance, dependentServiceInstances);
 
         return isObjectOrFunction(newService) ? newService : serviceInstance;
     }
 
-    function createInstanceAndInheritFrom(service) {
-        var NewService = function () { };
-        var isServiceAnnotated = isArray(service);
+    function createInstance(serviceFunction) {
 
-        NewService.prototype = (isServiceAnnotated ? service[service.length - 1] : service).prototype;
+        var NewService = function () { };
+
+        var isServiceAnnotated = isArray(serviceFunction);
+
+        serviceFunction = isServiceAnnotated
+            ? serviceFunction[serviceFunction.length - 1]
+            : serviceFunction;
+
+        NewService.prototype = serviceFunction.prototype;
+
         return new NewService();
     }
 

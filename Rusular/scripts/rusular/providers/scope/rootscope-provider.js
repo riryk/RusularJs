@@ -1,20 +1,20 @@
-﻿function rootScopeProvider() {
-    var TTL = 10;
-    var $rootScopeMinErr = minErr("$rootScope");
-    var lastDirtyWatch = null;
+﻿
+function rootScopeProvider() {
+
+    var ttl = 10;
 
     this.digestTtl = function (value) {
         if (arguments.length) {
-            TTL = value;
+            ttl = value;
         }
-        return TTL;
+        return ttl;
     };
 
-    this.$get = ["$injector", "$exceptionHandler", "$parse", "$browser",
-            function ($injector, $exceptionHandler, $parse, $browser) {
+    this.get = ["injector", "exceptionHandler", "parse", "browser",
+            function (injector, exceptionHandler, parse, browser) {
 
-                var $rootScope = new Scope();
+                var rootScope = new Scope();
 
-                return $rootScope;
+                return rootScope;
             }];
 }

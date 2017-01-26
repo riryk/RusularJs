@@ -1,7 +1,7 @@
 ﻿
 function createAnnotate() {
     var argumentsSplitter = /,/;
-    var argumentsRegex = /^\s*(_?)(\S+?)\1\s*$/;
+    var argumentsRegex = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
     var argumentRegex = /^\s*(_?)(\S+?)\1\s*$/;
     var skipCommentsRegex = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
 
@@ -29,9 +29,11 @@ function createAnnotate() {
     }
 
     function convertFunctionArgumentsToArray(functionToConvert) {
-        var arguments = [];
+
+        var formattedArguments = [];
+
         if (!functionToConvert.length) {
-            return arguments;
+            return formattedArguments;
         }
 
         var functionText = functionToConvert.toString().replace(skipCommentsRegex, "");
@@ -40,11 +42,11 @@ function createAnnotate() {
 
         forEach(functionArguments, function (functionArgument) {
             functionArgument.replace(argumentRegex, function (all, underscore, name) {
-                arguments.push(name);
+                formattedArguments.push(name);
             });
         });
 
-        return arguments;
+        return formattedArguments;
     }
 
     function isFunction(functionToAnnotate) {
